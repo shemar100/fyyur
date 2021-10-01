@@ -17,4 +17,4 @@ db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
 
-import application.contoller
+import application.controller

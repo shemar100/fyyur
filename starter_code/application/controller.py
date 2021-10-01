@@ -10,7 +10,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from application.forms import *
 from application import app, db
-from application.Models import Artist, Venue
+from application.Models import Artist, Venue, Show
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -90,8 +90,8 @@ def show_venue(venue_id):
     "city": venue.city,
     "state": venue.state,
     "phone": venue.phone,
-    "website": "https://www.themusicalhop.com",#add website filed to venue model
-    "facebook_link": "https://www.facebook.com/TheMusicalHop",
+    "website": venue.website_link,#add website filed to venue model
+    "facebook_link": venue.facebook_link,
     "seeking_talent": True, #add seeking_talent to venue model
     "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",#seking description model
     "image_link": venue.image_link,
@@ -130,6 +130,7 @@ def create_venue_submission():
     phone=form.phone.data, 
     image_link=form.image_link.data, 
     website_link=form.website_link.data,
+    facebook_link= form.facebook_link.data,
     seeking_talent=form.seeking_talent.data,
     seeking_description=form.seeking_description.data)
     db.session.add(venue)
@@ -321,12 +322,28 @@ def create_artist_form():
 def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
+  try:
+    form = ArtistForm()
+    artist = Artist(
+      name=form.name.data,
+      city=form.name.data,
+      state=form.state.data,
+      phone=form.phone.data,
+      genres=form.genres.data,
+      image_link=form.image_link.data,
+      facebook_link=form.facebook_link.data
+    )
   # TODO: modify data to be the data object returned from db insertion
-
+    db.session.add(artist)
+    db.session.commit()
   # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    flash('Artist ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+  except Exception as e:
+    flash(f"An error has Occured ' + Artist request.form['name'] + ' Could not be listed!")
+  finally:
+    db.session.close()
   return render_template('pages/home.html')
 
 
